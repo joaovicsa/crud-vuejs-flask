@@ -1,33 +1,51 @@
-from flask import Flask, request, jsonify
+from flask import Blueprint, request, jsonify
 from dataclasses import asdict
+from pymongo import MongoClient
+from .models import User, UserPreferences
+from .parser import parse_roles
 
-app = Flask(__name__)
-app.config["MONGO_URI"] = "mongodb://localhost:27017/"
-mongo = PyMongo(app)
+api = Blueprint('api', __name__)
 
-@app.route('/users', methods=['GET'])
+# MongoDB connection setup
+client = MongoClient("mongodb://localhost:27017/")
+db = client["users"]
+collection = db["crud"]
+
+def parse_user(data):
+    roles = parse_roles(data)
+    preferences = UserPreferences(timezone=data["user_timezone"])
+    created_ts = data.get("created_ts", time.time())
+    
+    user = User(
+        username=data["username"],
+        password=data["password"],
+        roles=roles,
+        preferences=preferences,
+        active=data.get("is_user_active", True),
+        created_ts=created_ts
+    )
+    return user
+
+@api.route('/users', methods=['GET'])
 def get_users():
-    users = mongo.db.users.find()
-    return jsonify([user for user in users])
+    users = list(collection.find({}, {'_id': 0}))
+    return jsonify(users)
 
-@app.route('/users', methods=['POST'])
+@api.route('/users', methods=['POST'])
 def add_user():
     data = request.json
     user = parse_user(data)
-    mongo.db.users.insert_one(asdict(user))
+    collection.insert_one(asdict(user))
     return jsonify({"msg": "User added successfully"}), 201
 
-@app.route('/users/<username>', methods=['PUT'])
+@api.route('/users/<username>', methods=['PUT'])
 def update_user(username):
     data = request.json
     user = parse_user(data)
-    mongo.db.users.update_one({"username": username}, {"$set": asdict(user)})
+    collection.update_one({"username": username}, {"$set": asdict(user)})
     return jsonify({"msg": "User updated successfully"})
 
-@app.route('/users/<username>', methods=['DELETE'])
+@api.route('/users/<username>', methods=['DELETE'])
 def delete_user(username):
-    mongo.db.users.delete_one({"username": username})
+    collection.delete_one({"username": username})
     return jsonify({"msg": "User deleted successfully"})
-
-if __name__ == "__main__":
-    app.run(debug=True)

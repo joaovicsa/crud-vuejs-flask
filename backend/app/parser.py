@@ -62,22 +62,3 @@ if __name__ == "__main__":
     
     print("Data imported successfully.")
 
-# def import_users_to_mongodb():
-# # Connect to MongoDB
-#     client = MongoClient("mongodb://localhost:27017/")
-#     db = client["users"]
-#     collection = db["crud"]
-
-#     # Load JSON data from file
-#     with open('init.json') as file:
-#         file_data = json.load(file)
-
-#     # # Parse and insert data
-#     # # Insert into MongoDB
-#     # result = collection.insert_many(users)
-
-#     if isinstance(file_data, list):
-#         result = collection.insert_many(file_data)
-#     else:
-#         result = collection.insert_one(file_data)
-#     print(f"Inserted {len(result.inserted_ids)} users into MongoDB.")
