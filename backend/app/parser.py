@@ -3,7 +3,7 @@ import json
 import pymongo 
 import time
 from dataclasses import asdict
-from models import User, UserPreferences
+from .models import User, UserPreferences
 
 def parse_roles(data):
     roles = []

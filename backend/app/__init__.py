@@ -1,11 +1,18 @@
-# __init__.py
 import os
 from flask import Flask
 from flask_cors import CORS
+from flask_pymongo import PyMongo
+from dotenv import load_dotenv
+
 from .models import init_app
 from .routes import api
 
+# Load environment variables from .env file
+load_dotenv()
+
 MONGO_URI = os.getenv("MONGO_URI")
+
+mongo = PyMongo()
 
 def create_app():
     app = Flask(__name__)
@@ -13,6 +20,7 @@ def create_app():
 
     CORS(app)
 
+    mongo.init_app(app)
     init_app(app)
 
     app.register_blueprint(api, url_prefix="/api")
