@@ -1,13 +1,9 @@
 import os
-from flask import Flask
+from flask import Flask, jsonify
 from flask_cors import CORS
 from flask_pymongo import PyMongo
 from dotenv import load_dotenv
 
-from .models import init_app
-from .routes import api
-
-# Load environment variables from .env file
 load_dotenv()
 
 MONGO_URI = os.getenv("MONGO_URI")
@@ -19,10 +15,17 @@ def create_app():
     app.config["MONGO_URI"] = MONGO_URI
 
     CORS(app)
-
     mongo.init_app(app)
-    init_app(app)
 
+    # Test the database connection
+    with app.app_context():
+        try:
+            mongo.db.command('ping')
+            print("Connected to MongoDB successfully!")
+        except Exception as e:
+            print(f"Failed to connect to MongoDB: {e}")
+
+    from .routes import api
     app.register_blueprint(api, url_prefix="/api")
 
     return app

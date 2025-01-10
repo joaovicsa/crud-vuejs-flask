@@ -2,7 +2,7 @@ import time
 from flask import Blueprint, request, jsonify
 from pymongo import MongoClient
 from bson import ObjectId
-from .models import User, UserPreferences
+from .models import User, UserPreferences, mongo
 from .parser import parse_roles
 
 api = Blueprint('api', __name__)
@@ -50,3 +50,11 @@ def update_user(username):
 def delete_user(username):
     collection.delete_one({"username": username})
     return jsonify({"msg": "User deleted successfully"})
+
+@api.route('/health', methods=['GET'])
+def health_check():
+    try:
+        mongo.db.command('ping')
+        return jsonify(status="success", message="Connected to MongoDB"), 200
+    except Exception as e:
+        return jsonify(status="error", message=f"Failed to connect to MongoDB: {e}"), 500
