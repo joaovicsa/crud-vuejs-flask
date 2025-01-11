@@ -1,4 +1,5 @@
 <template>
+  
   <v-container>
     <v-card>
       <v-card-title>
@@ -44,7 +45,7 @@
 
 <script lang="ts">
 import { defineComponent, ref, onMounted } from 'vue';
-import { getUsers, deleteUser as deleteUserService, User } from '@/services/userService';
+import { getUsers, deleteUser as deleteUserService, User } from '@/lib/userService';
 import UserForm from '@/components/UserForm.vue';
 
 export default defineComponent({

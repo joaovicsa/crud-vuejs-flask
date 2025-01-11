@@ -17,7 +17,7 @@
 <script lang="ts">
 import { defineComponent, ref, onMounted } from 'vue';
 import { useRoute } from 'vue-router';
-import { getUser } from '@/services/userService';
+import { getUser } from '@/lib/userService';
 
 export default defineComponent({
   name: 'UserView',
